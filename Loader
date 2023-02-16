@@ -1,0 +1,380 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("NinjDestroyer", "Midnight")
+local nearestEntry
+local at
+local stp = false
+local abuyv
+
+local chests = {
+
+}
+
+for _,v in pairs(game:GetService("Workspace"):GetDescendants()) do
+	if v.Name == "Chest" or v.Name == "Hoop" then
+		table.insert(chests,v.CFrame)
+	end
+end
+
+local islandloc = {
+
+}
+
+for _,v in pairs(game:GetService("Workspace").islandUnlockParts:GetChildren()) do
+	table.insert(islandloc,v.CFrame)
+end
+
+local islands = {
+	
+}
+
+for _,v in pairs(game:GetService("Workspace").islandUnlockParts:GetChildren()) do
+	table.insert(islands,v)
+end
+
+local PlayerTab = Window:NewTab("Character")
+
+local Section = PlayerTab:NewSection("speed")
+
+Section:NewSlider("Walk Speed", "Change how fast you walk", 250, 16, function(amount)
+	local plr = game.Players.LocalPlayer
+	local char = plr.Character
+	char.Humanoid.WalkSpeed = amount
+end)
+
+Section:NewSlider("JumpPower", "Change how far you jump", 250, 50, function(amount)
+	local plr = game.Players.LocalPlayer
+	local char = plr.Character
+	char.Humanoid.UseJumpPower = true
+	char.Humanoid.JumpPower = amount
+end)
+
+local PlayerTab = Window:NewTab("Farms")
+
+local Section = PlayerTab:NewSection("Farming utilities")
+
+function message(text)
+	game.StarterGui:SetCore("ChatMakeSystemMessage",{
+		Text = "[NinjDestroyer] "..text;
+	})
+end
+
+function findPlayer(str)
+	print("executed")
+	for _,v in pairs(game.Players:GetPlayers()) do
+		print("found")
+		print(v.Name)
+		local splitTable = string.split(v.Name,str)
+
+		if splitTable[2] ~= nil then
+			print("Returned")
+			return v
+		end
+	end
+end
+
+function notif(text)
+	game.StarterGui:SetCore("SendNotification",{
+		Title = "[NinjDestroyer]";
+		Text = text;
+	})
+end
+
+function fullnotif(text)
+	notif(text)
+	message(text)
+end
+
+
+function autoTrain()
+	repeat wait(0.01)
+		local s,e = pcall(function()
+			local plr = game.Players.LocalPlayer
+			local char = plr.Character
+			local hrp = char:WaitForChild("HumanoidRootPart",1)
+
+			local args = {
+				[1] = "swingKatana"
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))
+			if stp == false then
+				hrp.CFrame = CFrame.new(98,91246,128.5)
+				hrp.Velocity = Vector3.new(5,0,5)
+			end
+		end)
+		if e then
+			print(e)
+		end
+	until at == false
+end
+
+Section:NewToggle("auto train", "train automatically!", function(state)
+	at = state
+	if state == true then
+		fullnotif("auto train on")
+		autoTrain()
+	end
+end)
+
+Section:NewToggle("turn off sell tp", "stop the spam tp!", function(state)
+	stp = state
+end)
+
+function abuy()
+	repeat wait(0.4)
+		local s,e = pcall(function()
+			local plr = game.Players.LocalPlayer
+			local char = plr.Character
+			local hrp = char:WaitForChild("HumanoidRootPart",1)
+
+			local args = {
+				[1] = "buyAllSwords",
+				[2] = "Ground"
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))
+			local args = {
+				[1] = "buyAllBelts",
+				[2] = "Ground"
+			}
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))
+			for _,v in pairs(islands) do
+				wait(0.02)
+				local args = {
+					[1] = "buyAllSwords",
+					[2] = v.Name
+				}
+
+				plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))
+				local args = {
+					[1] = "buyAllBelts",
+					[2] = v.Name
+				}
+
+				plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))
+			end
+		end)
+		if e then
+			print(e)
+		end
+	until abuyv == false
+end
+
+Section:NewToggle("auto buy", "buy items!", function(state)
+	abuyv = state
+	if state == true then
+		fullnotif("auto buy on")
+		abuy()
+	end
+end)
+
+local PlayerTab = Window:NewTab("island")
+
+local Section = PlayerTab:NewSection("island tp's")
+
+Section:NewButton("unlock all islands", "tp to the island!", function(state)
+	local s,e = pcall(function()
+		local plr = game.Players.LocalPlayer
+		local char = plr.Character
+		local hrp = char:WaitForChild("HumanoidRootPart",1)
+		for _,v in pairs(islandloc) do
+			wait(0.2)
+			hrp.CFrame = v
+		end
+	end)
+end)
+
+for _,v in pairs(game:GetService("Workspace").islandUnlockParts:GetChildren()) do
+	Section:NewButton("tp to "..v.Name, "tp to the island!", function(state)
+		local plr = game.Players.LocalPlayer
+		local char = plr.Character
+		local hrp = char:WaitForChild("HumanoidRootPart",1)
+		hrp.CFrame = v.CFrame
+	end)
+end
+
+local PlayerTab = Window:NewTab("OP")
+
+local Section = PlayerTab:NewSection("FREE ITEMS")
+
+Section:NewButton("get tons of items!", "LOL!", function(state)
+	local s,e = pcall(function()
+		local plr = game.Players.LocalPlayer
+		local char = plr.Character
+		local hrp = char:WaitForChild("HumanoidRootPart",1)
+		for _,v in pairs(chests) do
+			wait(0.2)
+			hrp.CFrame = v
+		end
+	end)
+end)
+
+Section = PlayerTab:NewSection("Exploits")
+Section:NewTextBox("kill a player (try)", "kill a player (shorten name)", function(txt)
+	local plr = game.Players.LocalPlayer
+	local target = findPlayer(txt)
+
+	if target ~= nil then
+		local s,e = pcall(function()
+			local tchar = game.Workspace:WaitForChild(target.Name,0.001)
+			
+			fullnotif("Hold shuriken")
+			task.wait(2)
+			local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))
+			local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))local args = {
+				[1] = "attackShuriken",
+				[2] = tchar.HumanoidRootPart.Position
+			}
+
+			plr:WaitForChild("ninjaEvent"):FireServer(unpack(args))
+		end)
+		if e then
+			game.StarterGui:SetCore("SendNotification",{
+				Title = "error",
+				Text = "Player left or died!",
+				Duration = 6
+			})
+		end
+	else
+		game.StarterGui:SetCore("SendNotification",{
+			Title = "error",
+			Text = "Player not found or player died!",
+			Duration = 6
+		})
+	end
+end)
